@@ -1,11 +1,22 @@
 function createPhonepePaymentRequest(data){
-    if (!window.PaymentRequest) return null;
-
+    if (!window.PaymentRequest){
+        // paymentRequest not supported for this browser.
+        info("Here paymentRequest not supported");
+        return null;
+    }
+    paymentRequestPhonepe && paymentRequestPhonepe.abort();
     var paymentRequestPhonepe = new PaymentRequest([{
         supportedMethods: ["https://mercury-stg.phonepe.com/transact/checkout"],
         data: data
     }], {total: {label: 'Cart Amount', amount: {currency: 'INR', value: '100'}}});
     return paymentRequestPhonepe;
+}
+
+function info(msg) {
+  let element = document.createElement('pre');
+  element.innerHTML = msg;
+  element.className = 'info';
+  document.getElementById('msg').appendChild(element);
 }
 
 function openPhonepeExpressbuy(ppeUrl, handleResponse, handleError) {

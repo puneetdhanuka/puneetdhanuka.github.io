@@ -52,7 +52,7 @@ async function warmupAndSaveResults(paymentRequestContext) {
         constraints : paymentRequestContext?.constraints ?? []
     }
     var paymentRequestPhonepe = createPhonepePaymentRequest(data);
-    console.log("created first time payment object:', paymentRequestPhonepe);
+    console.log("created first time payment object:", paymentRequestPhonepe);
     if(isAndroid && paymentRequestPhonepe != null)
     {
         paymentRequestSupported = true;

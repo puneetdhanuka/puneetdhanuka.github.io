@@ -33,7 +33,7 @@ async function getExpressbuyResults(paymentRequestContext){
 }
 
 async function warmupAndSaveResults(paymentRequestContext) {
-    if(sessionStorage.getItem('eligibilityForExpressbuy') == true){
+    if(sessionStorage.getItem('eligibilityForExpressbuy') == 'true'){
         console.log("eligibility is true next time ");
         return;
     }

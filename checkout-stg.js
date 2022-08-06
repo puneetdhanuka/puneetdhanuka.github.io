@@ -1,22 +1,11 @@
 function createPhonepePaymentRequest(data){
-    if (!window.PaymentRequest){
-        // paymentRequest not supported for this browser.
-        info("Here paymentRequest not supported");
-        return null;
-    }
-    paymentRequestPhonepe && paymentRequestPhonepe.abort();
+    if (!window.PaymentRequest) return null;
+
     var paymentRequestPhonepe = new PaymentRequest([{
         supportedMethods: ["https://mercury-stg.phonepe.com/transact/checkout"],
         data: data
     }], {total: {label: 'Cart Amount', amount: {currency: 'INR', value: '100'}}});
     return paymentRequestPhonepe;
-}
-
-function info(msg) {
-  let element = document.createElement('pre');
-  element.innerHTML = msg;
-  element.className = 'info';
-  document.getElementById('msg').appendChild(element);
 }
 
 function openPhonepeExpressbuy(ppeUrl, handleResponse, handleError) {
@@ -54,6 +43,7 @@ async function warmupAndSaveResults(paymentRequestContext) {
     var retries = sessionStorage.getItem('hasEnrolledInstrumentRetries') ?? 0;
     if(userOperatingSystem.includes("Android"))
         isAndroid = true;
+    var elapsedTime = -1;
     console.log(userOperatingSystem);
     console.log(isAndroid);
 
@@ -62,22 +52,24 @@ async function warmupAndSaveResults(paymentRequestContext) {
         constraints : paymentRequestContext?.constraints ?? []
     }
     var paymentRequestPhonepe = createPhonepePaymentRequest(data);
+    console.log("created first time payment object:', paymentRequestPhonepe);
     if(isAndroid && paymentRequestPhonepe != null)
     {
         paymentRequestSupported = true;
         canMakePayment = await paymentRequestPhonepe.canMakePayment();
-        startTime = performance.now();
+        var startTime = performance.now();
         var pageRetryLimit = 3;
         while(canMakePayment == true && retries < 9 && hasEnrolledInstrument == false && pageRetryLimit > 0)
         {
             hasEnrolledInstrument = await paymentRequestPhonepe.hasEnrolledInstrument()
+            console.log("hasEnrolledInstrument value:", hasEnrolledInstrument);
             if(hasEnrolledInstrument) break;
-            paymentRequestPhonepe = createPhonepePaymentRequest(data);
+            //paymentRequestPhonepe = createPhonepePaymentRequest(data);
             retries++;
             pageRetryLimit--;
         }
-        endTime = performance.now();
-        var elapsedTime = endTime - startTime;
+        var endTime = performance.now();
+        elapsedTime = endTime - startTime;
     }
     sessionStorage.setItem('hasEnrolledInstrumentRetries', retries);
     sessionStorage.setItem('eligibilityForExpressbuy', hasEnrolledInstrument);

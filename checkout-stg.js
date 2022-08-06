@@ -33,6 +33,10 @@ async function getExpressbuyResults(paymentRequestContext){
 }
 
 async function warmupAndSaveResults(paymentRequestContext) {
+    if(sessionStorage.getItem('eligibilityForExpressbuy') == true){
+        console.log("eligibility is true next time ");
+        return;
+    }
     console.log(navigator.userAgent);
     var userOperatingSystem = navigator.userAgent.split(';')[1].trim();
     var network = navigator.connection.effectiveType;
@@ -62,7 +66,7 @@ async function warmupAndSaveResults(paymentRequestContext) {
         while(canMakePayment == true && retries < 9 && hasEnrolledInstrument == false && pageRetryLimit > 0)
         {
             hasEnrolledInstrument = await paymentRequestPhonepe.hasEnrolledInstrument()
-            console.log("hasEnrolledInstrument value:", hasEnrolledInstrument);
+            console.log("hasEnrolledInstrument value & count", hasEnrolledInstrument, retries);
             if(hasEnrolledInstrument) break;
             //paymentRequestPhonepe = createPhonepePaymentRequest(data);
             retries++;

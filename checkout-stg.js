@@ -198,7 +198,7 @@ async function ppec_get_device_meta(payment_request_context) {
     var device_meta = new PPEC_Device_Meta();
     var process_tracker = new PPEC_Process_Tracker();
     var payment_request_data = {
-        url: "ppe://v2expressbuy",
+        url: "ppe://expressbuy",
         constraints: payment_request_context?.constraints ?? []
     };
     if (device_meta.get_payment_request_supported() == false) return device_meta;

@@ -194,37 +194,43 @@ function ppec_is_eligibility_cache_true() {
     return JSON.parse(ls.get(device_meta_cache_key))?.eligibility;
 }
 async function ppec_get_device_meta(payment_request_context) {
-    console.log('starting detection');
-    var device_meta = new PPEC_Device_Meta();
-    var process_tracker = new PPEC_Process_Tracker();
-    var payment_request_data = {
-        url: "ppe://v2expressbuy",
-        constraints: payment_request_context?.constraints ?? []
-    };
-    console.log('the payment_request_data is = ' + JSON.stringify(payment_request_data));
-    if (device_meta.get_payment_request_supported() == false) return device_meta;
-    device_meta.set_can_make_payment(await ppec_create_payment_request(payment_request_data, 1).canMakePayment());
-    console.log('can make payment value = ' + device_meta.canMakePayment);
-    if (device_meta.get_can_make_payment() == false) return device_meta;
-    process_tracker.start_tracking();
-    const has_enrolled_instrument_values = await Promise.all([
-        ppec_create_payment_request(payment_request_data, 1).hasEnrolledInstrument(),
-        ppec_create_payment_request(payment_request_data, 1).hasEnrolledInstrument(),
-        ppec_create_payment_request(payment_request_data, 1).hasEnrolledInstrument(),
-        ppec_create_payment_request(payment_request_data, 1).hasEnrolledInstrument(),
-        ppec_create_payment_request(payment_request_data, 1).hasEnrolledInstrument()
-    ]);
-    process_tracker.end_tracking();
-    device_meta.set_elapsed_time(process_tracker.get_elapsed_time());
-    console.log('has enrolled instrument values = ' +  JSON.stringify(has_enrolled_instrument_values));
-    has_enrolled_instrument_values.forEach(has_enrolled_instrument => {
-        if (device_meta.get_has_enrolled_instrument() == false) {
-            device_meta.set_has_enrolled_instrument(has_enrolled_instrument);
-            device_meta.set_eligibility(has_enrolled_instrument);
-        }
-    });
-    console.log('device meta = ' + JSON.stringify(device_meta));
-    return device_meta;
+    try{
+        console.log('starting detection');
+        var device_meta = new PPEC_Device_Meta();
+        var process_tracker = new PPEC_Process_Tracker();
+        var payment_request_data = {
+            url: "ppe://v2expressbuy",
+            constraints: payment_request_context?.constraints ?? []
+        };
+        console.log('the payment_request_data is = ' + JSON.stringify(payment_request_data));
+        if (device_meta.get_payment_request_supported() == false) return device_meta;
+        var can_make_payment = await ppec_create_payment_request(payment_request_data, 1).canMakePayment();
+        device_meta.set_can_make_payment(can_make_payment);
+        console.log('can make payment value = ' + device_meta.get_can_make_payment());
+        if (device_meta.get_can_make_payment() == false) return device_meta;
+        process_tracker.start_tracking();
+        const has_enrolled_instrument_values = await Promise.all([
+            ppec_create_payment_request(payment_request_data, 1).hasEnrolledInstrument(),
+            ppec_create_payment_request(payment_request_data, 1).hasEnrolledInstrument(),
+            ppec_create_payment_request(payment_request_data, 1).hasEnrolledInstrument(),
+            ppec_create_payment_request(payment_request_data, 1).hasEnrolledInstrument(),
+            ppec_create_payment_request(payment_request_data, 1).hasEnrolledInstrument()
+        ]);
+        process_tracker.end_tracking();
+        device_meta.set_elapsed_time(process_tracker.get_elapsed_time());
+        console.log('has enrolled instrument values = ' +  JSON.stringify(has_enrolled_instrument_values));
+        has_enrolled_instrument_values.forEach(has_enrolled_instrument => {
+            if (device_meta.get_has_enrolled_instrument() == false) {
+                device_meta.set_has_enrolled_instrument(has_enrolled_instrument);
+                device_meta.set_eligibility(has_enrolled_instrument);
+            }
+        });
+        console.log('device meta = ' + JSON.stringify(device_meta));
+        return device_meta;
+    }catch(err){
+        console.log(err);
+        return device_meta;
+    }
 }
 async function ppec_check_app_and_cache_device_meta(payment_request_context) {
     if (ppec_is_device_meta_cache_valid() && ppec_is_eligibility_cache_true()) return;

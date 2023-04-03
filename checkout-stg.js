@@ -180,6 +180,23 @@ function ppec_create_payment_request(payment_request_data, payable_amount) {
         }
     });
 }
+
+function ppec_create_payment_request_for_pay(payment_request_data, payable_amount) {
+    console.log('ppec_create_payment_request called at ' + Date.now());
+    return new PaymentRequest([{
+        supportedMethods: ["https://mercury-stg.phonepe.com/transact/pay"],
+        data: payment_request_data
+    }], {
+        total: {
+            label: 'Cart Amount',
+            amount: {
+                currency: 'INR',
+                value: payable_amount
+            }
+        }
+    });
+}
+
 function ppec_save_device_meta_to_cache_with_ttl(device_meta, ttl) {
     ls.set(device_meta_cache_key, JSON.stringify(device_meta), {
         ttl: ttl

@@ -1,3 +1,4 @@
 {
-  "whitelistedpg": ["cod", "phonepe"]
+"instrumenttype" : "UPI_INTENT",
+"whitelistedpg": ["cod", "phonepe_cv2"]
 }
